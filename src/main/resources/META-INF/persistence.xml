@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1"
+	xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+
+	<persistence-unit name="daca" transaction-type="RESOURCE_LOCAL">
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+		<!-- <non-jta-data-source>java:/livraria_Mysql</non-jta-data-source> -->
+		
+		<non-jta-data-source>java:/DACA_MySQL</non-jta-data-source>
+		
+		<class>entity.Item</class>
+		<class>entity.Usuario</class>
+		<class>entity.Aluguel</class>
+		<!-- <class>entity.Aluguel</class>-->
+
+		<properties>
+
+			<!-- Configuração Hibernate -->
+			<property name="hibernate.hbm2ddl.auto" value="update" />
+			<property name="hibernate.show_sql" value="true" />
+			<property name="hibernate.format_sql" value="true" />
+			<property name="hibernate.use_sql_comments" value="true" />
+			<!-- /Configuração Hibernate -->
+
+			<!-- Configuração Hibernate SGBD PostgreSQL -->
+			<!-- 
+			<property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL9Dialect" />
+			<property name="hibernate.default_schema" value="public" />
+			-->
+			<!-- /Configuração Hibernate SGBD PostgreSQL -->
+
+			<!-- Configuração Hibernate SGBD MySQL -->
+			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQL57InnoDBDialect" />
+			<property name="hibernate.default_catalog" value="daca" />
+			<!-- 
+			-->
+			<!-- /Configuração Hibernate SGBD MySQL -->
+		</properties>
+	</persistence-unit>
+</persistence>

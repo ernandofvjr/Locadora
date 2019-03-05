@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:o="http://omnifaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions">
+
+<ui:composition template="/WEB-INF/templates/__commonLayout.xhtml">
+	<f:metadata>
+		<o:viewParam name="usuario" value="#{criarAluguel.usuario}" />
+	  <f:viewAction action="#{criarAluguel.init()}"/>
+	</f:metadata>
+	
+	<ui:define name="title">
+		Criar Aluguel
+	</ui:define>
+
+	<ui:define name="content">
+		<h:outputScript name="locale-primefaces.js" library="js" />
+		
+		<p:messages id="messagesErrors" showDetail="false" closable="true" severity="error">
+        	<p:autoUpdate />
+    	</p:messages>
+    
+   	 	<p:growl id="idMessages" showDetail="false" severity="info">
+        	<p:autoUpdate />
+    	</p:growl>
+		<h:form id="formEdit">
+			<p:panelGrid columns="2">
+
+			
+				<f:facet name="header">Criar novo Aluguel para o usuário #{criarAluguel.usuario.nome}</f:facet>
+					
+					
+					<p:outputLabel value="Data de Aluguel" for="data-Aluguel"/>
+		            <ui:include src="/WEB-INF/templates/_calendario.xhtml">
+						<ui:param name="id" value="data-Aluguel" />
+						<ui:param name="required" value="true" />
+						<ui:param name="value" value="#{criarAluguel.aluguel.dataAluguel}" />
+						<ui:param name="name" value="Data de Aluguel" />
+					</ui:include>
+					
+					<p:outputLabel value="Data de Entrega" for="data-Entrega"/>
+		            <ui:include src="/WEB-INF/templates/_calendario.xhtml">
+						<ui:param name="id" value="data-Entrega" />
+						<ui:param name="required" value="true" />
+						<ui:param name="value" value="#{criarAluguel.aluguel.dataEntrega}" />
+						<ui:param name="name" value="Data de Entrega" />
+					</ui:include>
+	
+					<p:outputLabel value="Preço" for="preco"/>
+					<p:inputNumber id="preco" value="#{criarAluguel.aluguel.preco}" symbol="R$" required="true"
+	                                symbolPosition="s" emptyValue="empty"> 
+	                </p:inputNumber>
+
+	            
+	            
+    
+			</p:panelGrid>
+			
+			  	
+			<p:panelGrid columns="2" styleClass="ui-noborder">
+				<p:commandButton id="botaoSubmeter" action="#{criarAluguel.salvar}" value="Submit" update="@form" icon="fa fa-save" />
+					
+				<p:button id="botaoCancelar" outcome="/paginas/protegido/funcionario/filtrar_usuario" value="Cancel" icon="fa fa-remove" />
+			</p:panelGrid>	
+			
+			
+
+			
+			
+		
+
+			
+			
+			
+			
+
+			
+			
+
+		
+		
+		</h:form>
+		
+		
+		<h:form id="formFiltro">
+		
+		  <p:fieldset legend="Itens no Aluguel">
+				<p:dataTable id="tabelaItensAluguel" border="1" var="varItensAluguel" value="#{criarAluguel.aluguel.itens}" emptyMessage="Não há itens nesse aluguel"
+					rows="5" 
+					paginator="true" paginatorAlwaysVisible="false"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="5,10,15">
+				
+					<p:column headerText="Nome" style="text-align:center;" >
+	           			<h:outputText value="#{varItensAluguel.nome}" />
+	        		</p:column>	
+			       
+					<p:column headerText="Código">
+						<h:outputText value="#{varItensAluguel.cod}" />
+					</p:column>
+					
+					<p:column headerText="Tipo">
+	           			<h:outputText value="#{varItensAluguel.tipo.nome}" />
+	        		</p:column>
+					
+					<p:column headerText="Categoria">
+						<h:outputText value="#{varItensAluguel.categoria}" />
+					</p:column>
+					
+					<p:column headerText="Data de lançamento" style="text-align:center;">
+						<h:outputText value="#{varItensAluguel.dataLancamento}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+			
+					<p:column>
+						
+						<p:commandButton id="removerItemBotao" icon="fa fa-minus" action="#{criarAluguel.removerItemAluguel(varItensAluguel)}" 
+						update=":formFiltro" />   
+	        
+	
+	            		<p:tooltip id="toolTipRemoverItem" for="removerItemBotao" value="Remover" position="top"/>
+						
+						
+					</p:column>
+				</p:dataTable>
+				
+				
+				
+			</p:fieldset>
+			<p:panelGrid columns="2" styleClass="ui-noborder">
+				<p:panelGrid styleClass="ui-noborder">
+					<p:fieldset legend="Filtro">
+		
+				
+					<p:panelGrid columns="2" >
+						<f:facet name="caption">
+							<h:outputText value="Filtros"/>
+						</f:facet>		
+						<f:facet name="header">
+							<h:outputText value="Pesquisar Itens"/>
+						</f:facet>
+						
+						<p:outputLabel value="Nome" for="nome" />
+						<p:inputText id="nome" value="#{criarAluguel.filter.nome}" label="Nome" />
+			
+						<p:outputLabel value="Código" for="cod" />
+						<p:inputText id="cod" value="#{criarAluguel.filter.cod}" label="Código" />
+						
+						<p:outputLabel value="Categoria" for="categoria" />
+						<p:inputText id="categoria" value="#{criarAluguel.filter.categoria}" label="Categoria" />
+			
+						<p:outputLabel value="Data mínima do lançamento" for="dataLancamentoMin" />
+						<p:inputText id="dataLancamentoMin" value="#{criarAluguel.filter.dataLancamentoMin}" label="Data mínima do lancamento">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:inputText>
+			
+						<p:outputLabel value="Data máxima do lançamento" for="dataLancamentoMax" />
+				      	<p:inputText id="dataLancamentoMax" value="#{criarAluguel.filter.dataLancamentoMax}" label="Data máxima do lancamento">
+				        	<f:convertDateTime pattern="dd/MM/yyyy" />
+				        </p:inputText>
+			
+						<p:outputLabel value="Tipo de item" for="tipo" />
+						<p:selectOneMenu id="tipo" value="#{criarAluguel.filter.tipo}" label="Tipo de item">
+							<f:selectItem  itemLabel="Selecione" itemValue="#{null}" />
+							<f:selectItems value="#{index.getTipos()}" var="varTipo" itemLabel="#{varTipo.nome}" itemValue="#{varTipo}" />
+						</p:selectOneMenu>
+				
+				        <f:facet name="footer">
+			                <p:commandButton id="btn-pesquisar" value="Pesquisar" action="#{criarAluguel.filtrar()}" 
+			                	update=":formFiltro" icon="fa fa-search" />
+			                
+			                <p:commandButton id="btn-limpar-botao" value="Limpar" action="#{criarAluguel.limpar()}"  
+			                	update=":formFiltro tabelaItens" process="@this" icon="fa fa-eraser">
+	                    		<p:resetInput target=":formFiltro" />
+	                		</p:commandButton>	
+	                		
+			           </f:facet>
+						
+					</p:panelGrid>
+					
+			
+			</p:fieldset>
+			<p:fieldset legend="Resultado">
+				<p:dataTable id="tabelaItens" border="1" var="varItens" value="#{criarAluguel.itens}" emptyMessage="Nenhum registro foi encontrado."
+					rows="5" 
+					paginator="true" paginatorAlwaysVisible="false"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="5,10,15">
+				
+					<p:column headerText="Nome" style="text-align:center;" >
+	           			<h:outputText value="#{varItens.nome}" />
+	        		</p:column>	
+			       
+					<p:column headerText="Código">
+						<h:outputText value="#{varItens.cod}" />
+					</p:column>
+					
+					<p:column headerText="Tipo">
+	           			<h:outputText value="#{varItens.tipo.nome}" />
+	        		</p:column>
+					
+					<p:column headerText="Categoria">
+						<h:outputText value="#{varItens.categoria}" />
+					</p:column>
+					
+					<p:column headerText="Data de lançamento" style="text-align:center;">
+						<h:outputText value="#{varItens.dataLancamento}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+			
+					<p:column>
+						
+						<p:commandButton id="addItemBotao" icon="fa fa-plus" action="#{criarAluguel.addItemAluguel(varItens)}" 
+						update=":formFiltro" />   
+	        
+	            		<p:tooltip id="toolTipAddItem" for="addItemBotao" value="Adicionar" position="top"/>
+						
+						
+					</p:column>
+				</p:dataTable>
+				
+				
+				
+			</p:fieldset>
+			</p:panelGrid>
+			
+			
+			</p:panelGrid>
+		</h:form>
+
+	
+    </ui:define>
+</ui:composition>
+	
+</html>

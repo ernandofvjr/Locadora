@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/WEB-INF/templates/__commonLayout.xhtml">
+
+	
+	<ui:define name="title">
+		Lista de Aluguéis
+	</ui:define>
+
+	<ui:define name="content">
+		<h:outputScript name="locale-primefaces.js" library="js" />
+		
+		<p:growl id="idMessages" showDetail="false" severity="info">
+        	<p:autoUpdate />
+    	</p:growl>
+    
+		<p:messages id="messagesErrors" showDetail="false" closable="true" severity="error">
+		</p:messages>
+	
+		
+		<p:fieldset legend="Filtro">
+		
+
+		
+			<h:form id="formFiltro">
+			
+				<p:panelGrid columns="2" >
+					<f:facet name="caption">
+						<h:outputText value="Filtros"/>
+					</f:facet>		
+					<f:facet name="header">
+						<h:outputText value="Pesquisar Aluguéis"/>
+					</f:facet>
+
+					<p:outputLabel value="Cpf" for="cpf" />
+					<p:inputMask id="cpf" value="#{filtrarAluguel.filter.cpfUsuario}" mask="999.999.999-99" label="Cpf"/>					
+		
+					<p:outputLabel value="Data mínima de Aluguel" for="dataAluguelMin" />
+					<p:inputText id="dataAluguelMin" value="#{filtrarAluguel.filter.dataAluguelMin}" label="Data mínima de Aluguel">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</p:inputText>
+		
+					<p:outputLabel value="Data máxima de Aluguel" for="dataAluguelMax" />
+			      	<p:inputText id="dataAluguelMax" value="#{filtrarAluguel.filter.dataAluguelMax}" label="Data máxima de Aluguel">
+			        	<f:convertDateTime pattern="dd/MM/yyyy" />
+			        </p:inputText>
+		
+					<p:outputLabel value="Situação" for="situacao" />
+					<p:selectOneMenu id="situacao" value="#{filtrarAluguel.filter.situacao}" label="Situação">
+						<f:selectItem  itemLabel="Selecione" itemValue="#{null}" />
+						<f:selectItems value="#{filtrarUsuario.getSituacaoAluguel()}" var="varTipo" itemLabel="#{varTipo.nome}" itemValue="#{varTipo}" />
+					</p:selectOneMenu>
+					
+					<p:outputLabel for="preco" value="Preço"  />
+					<p:inputText id="preco" value="#{filtrarAluguel.filter.preco}" label="Preço" > 
+					 	<p:keyFilter regEx="/[\d\-\.]/"/>
+					</p:inputText>
+
+			        <f:facet name="footer">
+		                <p:commandButton id="btn-pesquisar" value="Pesquisar" action="#{filtrarAluguel.filtrar()}" 
+		                	update=":formFiltro messagesErrors :tabelaItens" icon="fa fa-search" />
+		                
+		                <p:commandButton id="btn-limpar-botao" value="Limpar" action="#{filtrarAluguel.limpar()}"  
+		                	update=":formFiltro messagesErrors :tabelaItens" process="@this" icon="fa fa-eraser">
+                    		<p:resetInput target=":formFiltro" />
+                		</p:commandButton>	
+                		
+		           </f:facet>
+
+				</p:panelGrid>
+				
+		
+			</h:form>
+		</p:fieldset>
+		<p:fieldset legend="Resultado">
+
+			<p:dataTable id="tabelaItens" border="1" var="aluguel" value="#{filtrarAluguel.aluguel}" emptyMessage="Nenhum registro foi encontrado."
+					rows="5" 
+					paginator="true" paginatorAlwaysVisible="false"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="5,10,15">
+			
+
+				<p:column headerText="Cpf do usuário">
+					<h:outputText value="#{aluguel.usuario.cpf}" />
+				</p:column>
+
+				
+
+				<p:column headerText="Data do aluguel" style="text-align:center;">
+					<h:outputText value="#{aluguel.dataAluguel}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</p:column>
+				
+				
+				<p:column headerText="Situação">
+					<h:outputText value="#{aluguel.situacao.nome}" />
+				</p:column>
+				
+				<p:column headerText="Data da entrega" style="text-align:center;">
+					<h:outputText value="#{aluguel.dataEntrega}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</p:column>
+
+				<p:column headerText="Preço">
+					<h:outputText value="#{aluguel.preco}" />
+				</p:column>
+
+				<p:column>
+					
+					
+					<p:commandButton id="excluirItemBotao" icon="fa fa-trash" action="#{filtrarAluguel.deletar(aluguel)}" >
+			    		 <p:confirm header="Confirmar exclusão." 
+			         		message="Você tem certeza que quer excluir o aluguel?" 
+			         		icon="ui-icon-alert" />              
+           			</p:commandButton>
+            		<p:tooltip id="toolTipExcluirItem" for="excluirItemBotao" value="Excluir" position="top"/>
+            		
+            		<p:link outcome="/paginas/protegido/funcionario/editar_aluguel.xhtml" value="Editar" style="float:left;">
+						<f:param name="aluguel" value="#{aluguel.id}" />
+					</p:link>
+					
+					
+				</p:column>
+
+			</p:dataTable>
+
+		</p:fieldset>
+		
+		<p:confirmDialog id="confirmDialog" global="true" showEffect="fade" hideEffect="fade">
+			<p:commandButton id="confirmYes" value="Sim" styleClass="ui-confirmdialog-yes" icon="fa fa-remove" />
+			<p:commandButton id="confirmNo" value="Não" styleClass="ui-confirmdialog-no" icon="fa fa-ban" />
+		</p:confirmDialog>
+		
+		
+
+	
+    </ui:define>
+</ui:composition>
+
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/WEB-INF/templates/__commonLayout.xhtml">
+
+	
+	<ui:define name="title">
+		Lista de Itens
+	</ui:define>
+
+	<ui:define name="content">
+		<h:outputScript name="locale-primefaces.js" library="js" />
+		
+		<p:growl id="idMessages" showDetail="false" severity="info">
+        	<p:autoUpdate />
+    	</p:growl>
+    
+		<p:messages id="messagesErrors" showDetail="false" closable="true" severity="error">
+			<p:autoUpdate />
+		</p:messages>
+	
+		
+		<p:fieldset legend="Filtro">
+		
+
+		
+			<h:form id="formFiltro">
+			
+				<p:panelGrid columns="2" >
+					<f:facet name="caption">
+						<h:outputText value="Filtros"/>
+					</f:facet>		
+					<f:facet name="header">
+						<h:outputText value="Pesquisar Itens"/>
+					</f:facet>
+					
+					<p:outputLabel value="Nome" for="nome" />
+					<p:inputText id="nome" value="#{filtrarItem.filter.nome}" label="Nome" />
+		
+					<p:outputLabel value="Código" for="cod" />
+					<p:inputText id="cod" value="#{filtrarItem.filter.cod}" label="Código" />
+					
+					<p:outputLabel value="Categoria" for="categoria" />
+					<p:inputText id="categoria" value="#{filtrarItem.filter.categoria}" label="Categoria" />
+		
+					<p:outputLabel value="Data mínima do lançamento" for="dataLancamentoMin" />
+					<p:inputText id="dataLancamentoMin" value="#{filtrarItem.filter.dataLancamentoMin}" label="Data mínima do lancamento">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</p:inputText>
+		
+					<p:outputLabel value="Data máxima do lançamento" for="dataLancamentoMax" />
+			      	<p:inputText id="dataLancamentoMax" value="#{filtrarItem.filter.dataLancamentoMax}" label="Data máxima do lancamento">
+			        	<f:convertDateTime pattern="dd/MM/yyyy" />
+			        </p:inputText>
+		
+					<p:outputLabel value="Tipo de item" for="tipo" />
+					<p:selectOneMenu id="tipo" value="#{filtrarItem.filter.tipo}" label="Tipo de item">
+						<f:selectItem  itemLabel="Selecione" itemValue="#{null}" />
+						<f:selectItems value="#{filtrarItem.getTipos()}" var="varTipo" itemLabel="#{varTipo.nome}" itemValue="#{varTipo}" />
+					</p:selectOneMenu>
+			
+			        <f:facet name="footer">
+		                <p:commandButton id="btn-pesquisar" value="Pesquisar" action="#{filtrarItem.filtrar()}" 
+		                	update=":formFiltro messagesErrors :tabelaItens" icon="fa fa-search" />
+		                
+		                <p:commandButton id="btn-limpar-botao" value="Limpar" action="#{filtrarItem.limpar()}"  
+		                	update=":formFiltro messagesErrors :tabelaItens" process="@this" icon="fa fa-eraser">
+                    		<p:resetInput target=":formFiltro" />
+                		</p:commandButton>	
+                		
+		           </f:facet>
+					
+				</p:panelGrid>
+				
+		
+			</h:form>
+		</p:fieldset>
+		<p:fieldset legend="Resultado">
+			<p:dataTable id="tabelaItens" border="1" var="varItens" value="#{filtrarItem.itens}" emptyMessage="Nenhum registro foi encontrado."
+					rows="5" 
+					paginator="true" paginatorAlwaysVisible="false"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="5,10,15">
+			
+				<p:column headerText="Nome" style="text-align:center;" >
+           			<h:outputText value="#{varItens.nome}" />
+        		</p:column>	
+		       
+				<p:column headerText="Código">
+					<h:outputText value="#{varItens.cod}" />
+				</p:column>
+				
+				<p:column headerText="Tipo">
+           			<h:outputText value="#{varItens.tipo.nome}" />
+        		</p:column>
+				
+				<p:column headerText="Categoria">
+					<h:outputText value="#{varItens.categoria}" />
+				</p:column>
+				
+				<p:column headerText="Data de lançamento" style="text-align:center;">
+					<h:outputText value="#{varItens.dataLancamento}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</p:column>
+		
+				<p:column>
+					
+					<f:facet name="header">Operações</f:facet>
+					<p:link outcome="/paginas/protegido/funcionario/admin/editar_item.xhtml" value="Editar" style="float:left;">
+						<f:param name="item" value="#{varItens.id}" />
+					</p:link>
+					
+					<p:commandButton id="excluirItemBotao" icon="fa fa-trash" action="#{filtrarItem.deletar(varItens)}" >
+			    		 <p:confirm header="Confirmar exclusão." 
+			         		message="Você tem certeza que quer excluir o item #{varItens.nome}?" 
+			         		icon="ui-icon-alert" />              
+           			</p:commandButton>
+            		<p:tooltip id="toolTipExcluirItem" for="excluirItemBotao" value="Excluir" position="top"/>
+					
+					
+				</p:column>
+			</p:dataTable>
+			
+		</p:fieldset>
+		
+		<p:confirmDialog id="confirmDialog" global="true" showEffect="fade" hideEffect="fade">
+			<p:commandButton id="confirmYes" value="Sim" styleClass="ui-confirmdialog-yes" icon="fa fa-remove" />
+			<p:commandButton id="confirmNo" value="Não" styleClass="ui-confirmdialog-no" icon="fa fa-ban" />
+		</p:confirmDialog>
+
+	
+    </ui:define>
+</ui:composition>
+
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/WEB-INF/templates/__commonLayout.xhtml">
+
+	
+	<ui:define name="title">
+		Lista de Usuários
+	</ui:define>
+
+	<ui:define name="content">
+		<h:outputScript name="locale-primefaces.js" library="js" />
+		
+		<p:growl id="idMessages" showDetail="false" severity="info">
+        	<p:autoUpdate />
+    	</p:growl>
+    
+		<p:messages id="messagesErrors" showDetail="false" closable="true" severity="error">
+		</p:messages>
+	
+		
+		<p:fieldset legend="Filtro">
+		
+
+		
+			<h:form id="formFiltro">
+			
+				<p:panelGrid columns="2" >
+					<f:facet name="caption">
+						<h:outputText value="Filtros"/>
+					</f:facet>		
+					<f:facet name="header">
+						<h:outputText value="Pesquisar Itens"/>
+					</f:facet>
+					
+					<p:outputLabel value="Nome" for="nome" />
+					<p:inputText id="nome" value="#{filtrarUsuario.filter.nome}" label="Nome" />
+		
+					<p:outputLabel value="Cpf" for="cpf" />
+					<p:inputMask id="cpf" value="#{filtrarUsuario.filter.cpf}" mask="999.999.999-99" label="Cpf"/>					
+		
+					<p:outputLabel value="Data mínima de Nascimento" for="dataNascMin" />
+					<p:inputText id="dataNascMin" value="#{filtrarUsuario.filter.dataNascMin}" label="Data mínima de Nascimento">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</p:inputText>
+		
+					<p:outputLabel value="Data máxima de Nascimento" for="dataNascMax" />
+			      	<p:inputText id="dataNascMax" value="#{filtrarUsuario.filter.dataNascMax}" label="Data máxima de Nascimento">
+			        	<f:convertDateTime pattern="dd/MM/yyyy" />
+			        </p:inputText>
+		
+					<p:outputLabel value="Grupo" for="grupo" />
+					<p:selectOneMenu id="grupo" value="#{filtrarUsuario.filter.grupo}" label="Grupo">
+						<f:selectItem  itemLabel="Selecione" itemValue="#{null}" />
+						<f:selectItems value="#{filtrarUsuario.getGrupos()}" var="varTipo" itemLabel="#{varTipo.nome}" itemValue="#{varTipo}" />
+					</p:selectOneMenu>
+			
+			        <f:facet name="footer">
+		                <p:commandButton id="btn-pesquisar" value="Pesquisar" action="#{filtrarUsuario.filtrar()}" 
+		                	update=":formFiltro messagesErrors :tabelaItens" icon="fa fa-search" />
+		                
+		                <p:commandButton id="btn-limpar-botao" value="Limpar" action="#{filtrarUsuario.limpar()}"  
+		                	update=":formFiltro messagesErrors :tabelaItens" process="@this" icon="fa fa-eraser">
+                    		<p:resetInput target=":formFiltro" />
+                		</p:commandButton>	
+                		
+		           </f:facet>
+					
+				</p:panelGrid>
+				
+		
+			</h:form>
+		</p:fieldset>
+		<p:fieldset legend="Resultado">
+			<p:dataTable id="tabelaItens" border="1" var="usuario" value="#{filtrarUsuario.usuario}" emptyMessage="Nenhum registro foi encontrado."
+					rows="5" 
+					paginator="true" paginatorAlwaysVisible="false"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="5,10,15">
+			
+				<p:column headerText="Nome" style="text-align:center;" >
+           			<h:outputText value="#{usuario.nome}" />
+        		</p:column>	
+		       
+				<p:column headerText="Cpf">
+					<h:outputText value="#{usuario.cpf}" />
+				</p:column>
+				
+				<p:column headerText="Grupo">
+           			<h:outputText value="#{usuario.grupo.nome}" />
+        		</p:column>
+				
+				<p:column headerText="Login">
+					<h:outputText value="#{usuario.login}" />
+				</p:column>
+				
+				<p:column headerText="Email">
+					<h:outputText value="#{usuario.email}" />
+				</p:column>
+				
+				<p:column headerText="Data de Nascimento" style="text-align:center;">
+					<h:outputText value="#{usuario.dataNasc}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</p:column>
+		
+				<p:column>
+					
+					<f:facet name="header">Operações</f:facet>
+					
+					<p:link outcome="/paginas/protegido/funcionario/editar_usuario.xhtml" value="Editar" style="float:left;" >
+						<f:param name="usuario" value="#{usuario.id}" />
+					</p:link>
+					<br/>
+					<p:link outcome="/paginas/protegido/funcionario/criar_aluguel.xhtml" value="Criar Aluguel" style="float:left;">
+						<f:param name="usuario" value="#{usuario.id}" />
+					</p:link>
+
+					<br/>
+					<p:commandButton id="excluirItemBotao" icon="fa fa-trash" action="#{filtrarUsuario.deletar(usuario)}" >
+			    		 <p:confirm header="Confirmar exclusão." 
+			         		message="Você tem certeza que quer excluir o usário #usuario.nome}?" 
+			         		icon="ui-icon-alert" />              
+           			</p:commandButton>
+            		<p:tooltip id="toolTipExcluirItem" for="excluirItemBotao" value="Excluir" position="top"/>
+            		<br/>
+            		<p:commandButton id="editUserPasswordDialog" icon="fa fa-edit" 
+						action="#{editarSenhaUsuario.armazenarSenhaAtualDoUsuario()}"
+						oncomplete="if (!args.validationFailed) { PF('userPasswordEditDialog').show() }" update=":userPasswordEditDialogId">
+						<f:setPropertyActionListener value="#{usuario}" target="#{editarSenhaUsuario.usuario}" />
+						<p:resetInput target=":userPasswordEditDialogId" />
+					</p:commandButton>
+					<p:tooltip id="toolTipEditUserPasswordDialog" for="editUserPasswordDialog" value="Senha" position="top"/>
+					
+					
+				</p:column>
+			</p:dataTable>
+			
+		</p:fieldset>
+		
+		<p:confirmDialog id="confirmDialog" global="true" showEffect="fade" hideEffect="fade">
+			<p:commandButton id="confirmYes" value="Sim" styleClass="ui-confirmdialog-yes" icon="fa fa-remove" />
+			<p:commandButton id="confirmNo" value="Não" styleClass="ui-confirmdialog-no" icon="fa fa-ban" />
+		</p:confirmDialog>
+		
+		
+		<p:dialog id="userPasswordEditDialogId" widgetVar="userPasswordEditDialog" header="Editar senha de usuário" modal="true" dynamic="true" closeOnEscape="true">
+	    
+	    	<p:messages id="idMessagesErrorsUserPasswordEdit" showDetail="false" closable="true" autoUpdate="true" severity="error" />
+	    
+			<!-- Observação quanto a diálogos e h:form: Todo diálogo deve ter seu próprio h:form. Lembrando que não deve haver nunca h:forms aninhados:
+				 Referência: https://stackoverflow.com/questions/18958729/pcommandbutton-action-doesnt-work-inside-pdialog -->
+			<h:form id="formEditPassword">
+		
+				<h:outputText value="Usuário: #{editarSenhaUsuario.usuario.nome}" />
+				
+				<h:panelGrid columns="2" styleClass="ui-noborder">
+					<f:facet name="header">Senha</f:facet>
+		
+					<p:outputLabel for="senhaAtual" value="Senha atual" />
+					<p:password id="senhaAtual" value="#{editarSenhaUsuario.confirmacaoPasswordAtual}" label="Senha atual" required="true" />
+		
+					<p:outputLabel for="senha" value="Nova senha" />
+					<p:password id="senha" value="#{editarSenhaUsuario.usuario.senha}" label="Nova senha" match="confirmarSenha" feedback="true" required="true" />
+		
+					<p:outputLabel for="confirmarSenha" value="Confirmar senha" />
+					<p:password id="confirmarSenha" value="#{editarSenhaUsuario.usuario.senha}" label="Confirmar senha" feedback="true" required="true" />
+		
+					<p:commandButton id="botaoSubmeterEditPassword" action="#{editarSenhaUsuario.alterarSenha(false)}" value="Submit" 
+						update="@form"
+						oncomplete="if (!args.validationFailed) { PF('userPasswordEditDialog').hide(); }" 
+						icon="fa fa-save" />
+					<p:commandButton id="botaoCancelarEditPassword" value="Cancel" onclick="PF('userPasswordEditDialog').hide();" icon="fa fa-remove" />
+				</h:panelGrid>
+			</h:form>
+	    
+	    </p:dialog>
+
+	
+    </ui:define>
+</ui:composition>
+
+</html>

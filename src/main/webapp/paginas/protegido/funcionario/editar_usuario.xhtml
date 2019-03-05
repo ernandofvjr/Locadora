@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:o="http://omnifaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions">
+
+<ui:composition template="/WEB-INF/templates/__commonLayout.xhtml">
+	<f:metadata>
+	  <o:viewParam name="usuario" value="#{editarUsuario.usuario}" />
+	  <f:viewAction action="#{editarUsuario.init()}"/>
+	</f:metadata>
+	
+	<ui:define name="title">
+		Criar/Editar Usuario
+	</ui:define>
+
+	<ui:define name="content">
+		<h:outputScript name="locale-primefaces.js" library="js" />
+		
+		<p:messages id="messagesErrors" showDetail="false" closable="true" severity="error">
+        	<p:autoUpdate />
+    	</p:messages>
+    
+   	 	<p:growl id="idMessages" showDetail="false" severity="info">
+        	<p:autoUpdate />
+    	</p:growl>
+		<h:form id="formEdit">
+			<p:panelGrid columns="2">
+			
+			<f:facet name="header">#{editarUsuario.edicao ? 'Editar Usuário' : 'Criar novo Usuário'}</f:facet>
+				
+				<p:outputLabel value="Id" rendered="#{editarUsuario.edicao}" />
+	       		<p:outputLabel value="#{editarUsuario.usuario.id}" rendered="#{editarUsuario.edicao}" />
+	       		
+	       		<p:outputLabel value="Nome" for="nome"/>
+	            <p:inputText id="nome" value="#{editarUsuario.usuario.nome}" required="true" label="Nome" >
+	            	<p:keyFilter regEx="/[a-z_]/i"/>
+	            </p:inputText>
+
+	            
+		        <p:outputLabel value="Cpf" for="cpf"/>
+		        <p:inputMask id="cpf" value="#{editarUsuario.usuario.cpf}" mask="999.999.999-99" label="Cpf" required="true"/>
+		        
+	            <p:outputLabel value="Data de Nascimento" for="data-Nascimento"/>
+	            <ui:include src="/WEB-INF/templates/_calendario.xhtml">
+					<ui:param name="id" value="data-Nascimento" />
+					<ui:param name="required" value="true" />
+					<ui:param name="value" value="#{editarUsuario.usuario.dataNasc}" />
+					<ui:param name="name" value="Data de Nascimento" />
+				</ui:include>
+				
+				<p:outputLabel value="Email" for="email"/>
+	            <p:inputText id="email" value="#{editarUsuario.usuario.email}" required="false" label="Email" />
+				
+				<p:outputLabel value="Login" for="login"/>
+	            <p:inputText id="login" value="#{editarUsuario.usuario.login}" required="true" label="Login" />
+	            
+	            <p:outputLabel value="Senha" for="senha" rendered="#{!editarUsuario.edicao}" />
+	            <p:password id="senha" value="#{editarUsuario.usuario.senha}" match="confirmacaoSenha" feedback="true" inline="true" required="true" label="Senha" rendered="#{!editarUsuario.edicao}" />
+	            
+	            <p:outputLabel for="confirmacaoSenha" value="Confirmar Senha" rendered="#{!editarUsuario.edicao}" />
+				<p:password id="confirmacaoSenha" value="#{editarUsuario.usuario.senha}" label="Confirmar Senha:" feedback="true" inline="true" required="true" rendered="#{!editarUsuario.edicao}" />
+	
+	           
+	            <p:outputLabel value="Grupo" for="grupo" rendered="#{menu.isUserInRole('ADMIN')}"/>
+	            <p:selectOneMenu id="grupo" value="#{editarUsuario.usuario.grupo}" required="true" label="Tipo" rendered="#{menu.isUserInRole('ADMIN')}">
+	                <f:selectItem  itemLabel="Selecione" itemValue="#{null}" noSelectionOption="true" itemDisabled="true"/>
+	                <f:selectItems value="#{editarUsuario.getGrupos()}" var="vItem" itemLabel="#{vItem.nome}" 
+	                    itemValue="#{vItem}" />
+	              	<p:ajax update="formEdit:pgUsuario"/>
+	            </p:selectOneMenu>
+ 	
+				
+			</p:panelGrid>
+
+			<p:panelGrid id="pgUsuario" columns="2" styleClass="ui-noborder">
+			
+				<p:outputLabel for="rua" value="Rua" rendered="#{editarUsuario.ehUsuario()}" />
+				<p:inputText id="rua" value="#{editarUsuario.usuario.rua}" label="Rua" rendered="#{editarUsuario.ehUsuario()}" />
+				
+				<p:outputLabel for="cep" value="Cep" rendered="#{editarUsuario.ehUsuario()}" />
+				<p:inputMask id="cep" value="#{editarUsuario.usuario.cep}" mask="99999-999" label="Cep" rendered="#{editarUsuario.ehUsuario()}"/>
+				
+				<p:outputLabel for="num" value="Número" rendered="#{editarUsuario.ehUsuario()}" />
+				<p:inputText id="num" value="#{editarUsuario.usuario.num}" label="Número" rendered="#{editarUsuario.ehUsuario()}"> 
+					 <p:keyFilter regEx="/[\d\-\.]/"/>
+				</p:inputText>
+
+			</p:panelGrid>
+			
+			<p:panelGrid columns="2" styleClass="ui-noborder">
+				<p:commandButton id="botaoSubmeter" action="#{editarUsuario.salvar}" value="Submit" update="@form" icon="fa fa-save" />
+				 <p:button outcome="/paginas/protegido/funcionario/filtrar_usuario.xhtml" value="Cancelar" icon="ui-icon-cancel" />
+			</p:panelGrid>
+
+		
+		
+		</h:form>
+
+	
+    </ui:define>
+</ui:composition>
+	
+</html>

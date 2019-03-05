@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/WEB-INF/templates/__commonLayout.xhtml">
+
+	
+	<ui:define name="title">
+		Home
+	</ui:define>
+
+	<ui:define name="content">
+		<h:outputScript name="locale-primefaces.js" library="js" />
+		
+		<p:growl id="idMessages" showDetail="false" severity="info">
+        	<p:autoUpdate />
+    	</p:growl>
+    
+		<p:messages id="messagesErrors" showDetail="false" closable="true" severity="error">
+		</p:messages>
+		
+		<h:form id="formEdit">
+			<p:panelGrid columns="2">
+			
+			<f:facet name="header">Informações do usuário: #{index.usuario.nome}</f:facet>
+				
+	       		
+	       		<p:outputLabel value="Nome" for="nome"/>
+	       		<p:outputLabel id= "nome" value="#{index.usuario.nome}" />
+
+
+	            
+		        <p:outputLabel value="Cpf" for="cpf"/>
+		        <p:outputLabel id= "cpf" value="#{index.usuario.cpf}" />
+		        
+	            <p:outputLabel value="Data de Nascimento" for="data-Nascimento"/>
+	            <p:outputLabel id= "data-Nascimento" value="#{index.usuario.dataNasc}" >
+	           	 	<f:convertDateTime pattern="dd/MM/yyyy" />
+	           	</p:outputLabel>
+	            
+
+				
+				<p:outputLabel value="Email" for="email"/>
+				 <p:outputLabel id= "email" value="#{index.usuario.email}" />
+         
+	            
+	           
+	            <p:outputLabel value="Grupo" for="grupo"/>
+	            <p:outputLabel id= "grupo" value="#{index.usuario.grupo.nome}" />
+	            
+ 	
+				
+			</p:panelGrid>
+
+			<p:outputLabel value="Endereço" rendered="#{index.ehUsuario()}" />
+			<p:panelGrid id="pgUsuario" columns="2">
+				
+				
+				
+				<p:outputLabel for="rua" value="Rua" rendered="#{index.ehUsuario()}" />
+				<p:outputLabel id= "rua" value="#{index.usuario.rua}" rendered="#{index.ehUsuario()}"/>
+				
+				<p:outputLabel for="cep" value="Cep" rendered="#{index.ehUsuario()}" />
+				<p:outputLabel id= "cep" value="#{index.usuario.cep}" rendered="#{index.ehUsuario()}"/>
+				
+				<p:outputLabel for="num" value="Número" rendered="#{index.ehUsuario()}" />
+				<p:outputLabel id= "num" value="#{index.usuario.num}" rendered="#{index.ehUsuario()}"/>
+
+			</p:panelGrid>
+			
+
+			
+
+		
+		
+		</h:form>
+		
+        <p:commandButton id="editUserPasswordDialog" icon="fa fa-edit" 
+			action="#{editarSenhaUsuario.armazenarSenhaAtualDoUsuario()}"
+			oncomplete="if (!args.validationFailed) { PF('userPasswordEditDialog').show() }" update=":userPasswordEditDialogId">
+			<f:setPropertyActionListener value="#{index.usuario}" target="#{editarSenhaUsuario.usuario}" />
+			<p:resetInput target=":userPasswordEditDialogId" />
+		</p:commandButton>
+		<p:tooltip id="toolTipEditUserPasswordDialog" for="editUserPasswordDialog" value="Alterar Senha" position="top"/>
+		
+		<p:dialog id="userPasswordEditDialogId" widgetVar="userPasswordEditDialog" header="Editar senha de usuário" modal="true" dynamic="true" closeOnEscape="true">
+	    
+	    	<p:messages id="idMessagesErrorsUserPasswordEdit" showDetail="false" closable="true" autoUpdate="true" severity="error" />
+	    
+			<h:form id="formEditPassword">
+		
+				<h:outputText value="Usuário: #{editarSenhaUsuario.usuario.nome}" />
+				
+				<h:panelGrid columns="2" styleClass="ui-noborder">
+					<f:facet name="header">Senha</f:facet>
+		
+					<p:outputLabel for="senhaAtual" value="Senha atual" />
+					<p:password id="senhaAtual" value="#{editarSenhaUsuario.confirmacaoPasswordAtual}" label="Senha atual" required="true" />
+		
+					<p:outputLabel for="senha" value="Nova senha" />
+					<p:password id="senha" value="#{editarSenhaUsuario.usuario.senha}" label="Nova senha" match="confirmarSenha" feedback="true" required="true" />
+		
+					<p:outputLabel for="confirmarSenha" value="Confirmar senha" />
+					<p:password id="confirmarSenha" value="#{editarSenhaUsuario.usuario.senha}" label="Confirmar senha" feedback="true" required="true" />
+		
+					<p:commandButton id="botaoSubmeterEditPassword" action="#{editarSenhaUsuario.alterarSenha(true)}" value="Submit" 
+						update="@form"
+						oncomplete="if (!args.validationFailed) { PF('userPasswordEditDialog').hide(); }" 
+						icon="fa fa-save" />
+					<p:commandButton id="botaoCancelarEditPassword" value="Cancel" onclick="PF('userPasswordEditDialog').hide();" icon="fa fa-remove" />
+				</h:panelGrid>
+			</h:form>
+	    
+	    </p:dialog>
+		
+		
+
+	
+    </ui:define>
+</ui:composition>
+
+</html>

@@ -1,0 +1,13 @@
+
+mysql
+
+./subsystem=security/security-domain=locadoraJdbcRealm/:add(cache-type=default)
+
+./subsystem=security/security-domain=locadoraJdbcRealm/authentication=classic:add(login-modules=[{code=Database, flag=Required, module-options={ \
+    dsJndiName="java:/DACA_MySQL", \
+    principalsQuery="select senha from daca.tb_usuario where login = ?", \
+    rolesQuery="select grupo, 'Roles' from daca.tb_usuario where login =  ?", \
+    hashAlgorithm="SHA-256", \
+    hashEncoding="base64" \
+}}])
+

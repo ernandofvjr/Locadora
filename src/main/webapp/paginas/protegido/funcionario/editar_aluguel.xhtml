@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:o="http://omnifaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions">
+
+<ui:composition template="/WEB-INF/templates/__commonLayout.xhtml">
+	<f:metadata>
+		<o:viewParam name="aluguel" value="#{editarAluguel.aluguel}" />
+	  <f:viewAction action="#{editarAluguel.init()}"/>
+	</f:metadata>
+	
+	<ui:define name="title">
+		Editar Aluguel
+	</ui:define>
+
+	<ui:define name="content">
+		<h:outputScript name="locale-primefaces.js" library="js" />
+		
+		<p:messages id="messagesErrors" showDetail="false" closable="true" severity="error">
+        	<p:autoUpdate />
+    	</p:messages>
+    
+   	 	<p:growl id="idMessages" showDetail="false" severity="info">
+        	<p:autoUpdate />
+    	</p:growl>
+		<h:form id="formEdit">
+			<p:panelGrid columns="2">
+
+			
+				<f:facet name="header">Editar Aluguel do usuário #{editarAluguel.aluguel.usuario.nome}</f:facet>
+				
+				
+					<p:outputLabel value="Situação" for="situacao"/>
+	            	<p:selectOneMenu id="situacao" value="#{editarAluguel.aluguel.situacao}" required="true" label="Tipo" rendered="#{!editarAluguel.isEntregue()}">
+	                	<f:selectItems value="#{editarAluguel.getSituacaoAluguel()}" var="vItem" itemLabel="#{vItem.nome}" 
+	                    	itemValue="#{vItem}" />
+	           		 </p:selectOneMenu>
+	           		 
+	           		 <p:outputLabel value="#{editarAluguel.aluguel.situacao.nome}" rendered="#{editarAluguel.isEntregue()}"/>
+					
+					<!--
+					<p:outputLabel value="Data de Aluguel" for="data-Aluguel"/>
+		            <ui:include src="/WEB-INF/templates/_calendario.xhtml">
+						<ui:param name="id" value="data-Aluguel" />
+						<ui:param name="required" value="true" />
+						<ui:param name="value" value="#{editarAluguel.aluguel.dataAluguel}" />
+						<ui:param name="name" value="Data de Aluguel" />
+					</ui:include>
+					
+					<p:outputLabel value="Data de Entrega" for="data-Entrega"/>
+		            <ui:include src="/WEB-INF/templates/_calendario.xhtml">
+						<ui:param name="id" value="data-Entrega" />
+						<ui:param name="required" value="true" />
+						<ui:param name="value" value="#{editarAluguel.aluguel.dataEntrega}" />
+						<ui:param name="name" value="Data de Entrega" />
+
+					</ui:include>
+					
+					-->
+					<p:outputLabel value="Data de Aluguel" for="data-Aluguel"/>
+					<p:outputLabel value="#{editarAluguel.aluguel.dataAluguel}" id="data-Aluguel">
+						<f:convertDateTime pattern="dd-MM-yyyy" />
+					</p:outputLabel>
+					
+					
+					<p:outputLabel value="Data de Entrega" for="data-Entrega"/>
+					<p:outputLabel value="#{editarAluguel.aluguel.dataEntrega}" id="data-Entrega">
+						<f:convertDateTime pattern="dd-MM-yyyy" />
+					</p:outputLabel>
+					
+	
+					<p:outputLabel value="Preço" for="preco"/>
+					<p:inputNumber id="preco" value="#{editarAluguel.aluguel.preco}" symbol="R$" required="true"
+	                                symbolPosition="s" emptyValue="empty" disabled="true"> 
+	                </p:inputNumber>
+
+	            
+	            
+    
+			</p:panelGrid>
+			
+			 <p:fieldset legend="Itens no Aluguel">
+				<p:dataTable id="tabelaItensAluguel" border="1" var="varItensAluguel" value="#{editarAluguel.aluguel.itens}" emptyMessage="Não há itens nesse aluguel">
+				
+					<p:column headerText="Nome" style="text-align:center;" >
+	           			<h:outputText value="#{varItensAluguel.nome}" />
+	        		</p:column>	
+			       
+					<p:column headerText="Código">
+						<h:outputText value="#{varItensAluguel.cod}" />
+					</p:column>
+					
+					<p:column headerText="Tipo">
+	           			<h:outputText value="#{varItensAluguel.tipo.nome}" />
+	        		</p:column>
+					
+			
+				</p:dataTable>
+			</p:fieldset>
+			
+			  	
+			<p:panelGrid columns="2" styleClass="ui-noborder">
+				<p:commandButton id="botaoSubmeter" action="#{editarAluguel.salvar}" value="Submit" update="@form" icon="fa fa-save" rendered="#{!editarAluguel.isEntregue()}"/>
+					
+				<p:button id="botaoCancelar" outcome="/paginas/protegido/funcionario/filtrar_aluguel.xhtml" value="Cancel" icon="fa fa-remove" />
+			</p:panelGrid>	
+			
+
+		
+		</h:form>
+		
+
+    </ui:define>
+</ui:composition>
+	
+</html>

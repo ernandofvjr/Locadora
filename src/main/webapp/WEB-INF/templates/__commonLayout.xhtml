@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<h:head>
+	<title><ui:insert name="title">Página principal</ui:insert></title>
+</h:head>
+
+<h:body>
+
+	<ui:debug hotkey="z" />
+	
+	<div id="header">
+		<ui:insert name="header">
+			<!-- https://www.primefaces.org/showcase/ui/menu/menubar.xhtml -->
+			<h:form id="formMenu">
+				<p:menubar>
+					<p:menuitem id="submenuActionslHome" value="Home" url="/paginas/protegido/index.xhtml" icon="fa fa-fw fa-home"/>
+					<p:submenu id="submenuItem" label="Itens" icon="fa fa-fw fa-align-justify" rendered="#{menu.isUserInRole('ADMIN')}">
+						<p:menuitem id="submenuActionsItemHome" value="Filtrar" url="/paginas/protegido/funcionario/admin/filtrar_item.xhtml" icon="fa fa-fw fa-bars" rendered="#{menu.isUserInRole('ADMIN')}"/>
+						<p:menuitem id="submenuActionsItemAddItem" value="Add Item" url="/paginas/protegido/funcionario/admin/editar_item.xhtml" icon="fa fa-fw fa-clipboard" rendered="#{menu.isUserInRole('ADMIN')}"/>
+					</p:submenu>
+					<p:submenu id="submenuUsuario" label="Usuario" icon="fa fa-fw fa-address-book" rendered="#{menu.isUserInRoles('ADMIN','FUNCIONARIO')}">
+						<p:menuitem id="submenuActionsUsuarioHome" value="Filtrar" url="/paginas/protegido/funcionario/filtrar_usuario.xhtml" icon="fa fa-fw fa-address-book" rendered="#{menu.isUserInRoles('ADMIN','FUNCIONARIO')}"/>
+						<p:menuitem id="submenuActionsItemAddUsuario" value="Add Usuário" url="/paginas/protegido/funcionario/editar_usuario.xhtml" icon="fa fa-fw fa-clipboard" rendered="#{menu.isUserInRoles('ADMIN','FUNCIONARIO')}"/>
+					</p:submenu>
+					<p:submenu id="submenuAluguel" label="Aluguel" icon="fa fa-fw fa-address-card">
+						<p:menuitem id="submenuActionsAluguelHome" value="Filtrar" url="/paginas/protegido/funcionario/filtrar_aluguel.xhtml" icon="fa fa-fw fa-address-card" rendered="#{menu.isUserInRoles('ADMIN','FUNCIONARIO')}"/>
+						<p:menuitem id="submenuActionsAluguelUsuario" value="Ver Aluguéis" url="/paginas/protegido/aluguel_usuario.xhtml" icon="fa fa-fw fa-address-card" rendered="#{menu.isUserInRole('USUARIO')}"/>
+					</p:submenu>
+					<f:facet name="options">
+						Olá, <p:commandLink value="#{menu.usuarioLogado.nome}" style="margin-right:10px" />
+						<p:commandButton id="menuItemLogout" value="Logout" icon="fa fa-fw fa-sign-out" action="#{logout.efetuarLogout}" ajax="false" />
+					</f:facet>
+				</p:menubar>
+			</h:form>
+		</ui:insert>
+	</div>
+
+	<div id="content">
+		<ui:insert name="content" />
+	</div>
+
+	<div id="footer">
+		<p:panel columns="1" style="width : 100%; text-align:center">
+			<h:outputLabel value="Locadora - v1.0" />
+		</p:panel>
+	</div>
+
+</h:body>
+</html>

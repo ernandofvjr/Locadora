@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:o="http://omnifaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions">
+
+<ui:composition template="/WEB-INF/templates/__commonLayout.xhtml">
+	<f:metadata>
+	    <o:viewParam name="item" value="#{editarItem.item}" /> 
+	    <f:viewAction action="#{editarItem.init()}"/>
+	</f:metadata>
+	
+	<ui:define name="title">
+		Criar/Editar Item
+	</ui:define>
+
+	<ui:define name="content">
+		<h:outputScript name="locale-primefaces.js" library="js" />
+		
+		<p:messages id="messagesErrors" showDetail="false" closable="true" severity="error">
+        	<p:autoUpdate />
+    	</p:messages>
+    
+   	 	<p:growl id="idMessages" showDetail="false" severity="info">
+        	<p:autoUpdate />
+    	</p:growl>
+		<h:form id="formEdit">
+			<p:panelGrid columns="2">
+				<f:facet name="header">#{editarItem.edicao ? 'Editar item' : 'Criar novo item'}</f:facet>
+				
+				<p:outputLabel value="Id" rendered="#{editarItem.edicao}" />
+	       		<p:outputLabel value="#{editarItem.item.id}" rendered="#{editarItem.edicao}" />
+	       		
+	       		<p:outputLabel value="Nome" for="nome"/>
+	            <p:inputText id="nome" value="#{editarItem.item.nome}" required="true" label="Nome" >
+	            </p:inputText>
+	            
+		        <p:outputLabel value="Código" for="cod"/>
+		        <p:inputText id="cod" value="#{editarItem.item.cod}" required="true" label="Código" />
+		        
+		        
+		         <p:outputLabel value="Categorias" for="categoria"/>
+	            <p:inputTextarea id="categoria" value="#{editarItem.item.categoria}" required="true" label="Categorias"
+	                cols="21" rows="4" />
+	                
+	            <p:outputLabel value="Data de lançamento" for="data-lancamento"/>
+	            <ui:include src="/WEB-INF/templates/_calendario.xhtml">
+					<ui:param name="id" value="data-lancamento" />
+					<ui:param name="required" value="true" />
+					<ui:param name="value" value="#{editarItem.item.dataLancamento}" />
+					<ui:param name="name" value="Data deLançamento" />
+				</ui:include> 
+	           
+	            <p:outputLabel value="Tipo" for="tipo"/>
+	            <p:selectOneMenu id="tipo" value="#{editarItem.item.tipo}" required="true" label="Tipo">
+	                <f:selectItem  itemLabel="Selecione" itemValue="#{null}" noSelectionOption="true" itemDisabled="true"/>
+	                <f:selectItems value="#{editarItem.getTipos()}" var="vItem" itemLabel="#{vItem.nome}" 
+	                    itemValue="#{vItem}" />
+	            </p:selectOneMenu>
+           
+	            <p:outputLabel value="Descrição" for="descricao"/>
+	            <p:inputTextarea id="descricao" value="#{editarItem.item.descricao}" required="true" label="Descrição"
+	                cols="21" rows="4" />
+	           
+	            <f:facet name="footer">
+	                <p:commandButton action="#{editarItem.salvar}" value="Salvar"  icon="fa fa-save"/>
+	                <p:button outcome="/paginas/protegido/funcionario/admin/filtrar_item.xhtml" value="Cancelar" icon="ui-icon-cancel" />
+	            </f:facet>
+				
+				
+				
+			</p:panelGrid>
+		
+		
+		
+		</h:form>
+
+	
+    </ui:define>
+</ui:composition>
+	
+</html>
